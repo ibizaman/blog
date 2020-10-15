@@ -41,6 +41,7 @@ in
     ];
     buildInputs = with haskellPackages; [
       ghcid
+      ghcide
       brittany
       hlint
     ];
