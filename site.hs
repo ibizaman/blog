@@ -5,8 +5,12 @@ import           Hakyll
 
 
 --------------------------------------------------------------------------------
+conf :: Configuration
+conf = defaultConfiguration { deployCommand = "rm -rf ibizaman.github.io/* && cp -r _site/* ibizaman.github.io" }
+
+
 main :: IO ()
-main = hakyll $ do
+main = hakyllWith conf $ do
     match "images/*" $ do
         route   idRoute
         compile copyFileCompiler
