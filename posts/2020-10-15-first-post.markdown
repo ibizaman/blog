@@ -18,9 +18,10 @@ Let's talk about how to setup a blog similar to this one. This is my
 freshest project anyway.
 
 First caveat, I cannot yet publish this blog post because I've got
-nowhere to publish it! It's all local. This blog post will explain how
-to setup a Hakyll blog using nix... locally. Next blog post will talk
-about how to publish. And then you'll be able to read this, finally.
+nowhere to publish it! It's all local. Next blog post will explain how
+to setup a Hakyll blog using nix... locally. The following blog post
+will talk about how to publish. And then you'll be able to read this,
+finally.
 
 The stack is Hakyll on top of Haskell and nix. I really like that
 development environments setup with nix are fully reproducible. It's

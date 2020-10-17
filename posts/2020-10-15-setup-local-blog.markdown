@@ -3,7 +3,9 @@ title: Setup a Hakyll Blog with Nix
 ---
 
 This blog post explains how to setup this site. You can find the
-source code on [Github](https://github.com/ibizaman/blog).
+source code on [GitHub](https://github.com/ibizaman/blog). We will not
+publish yet, it will be all local. Publishing is for the following
+post.
 
 The stack we'll be using is [Hakyll](https://jaspervdj.be/hakyll/) on
 top of [Haskell](https://www.haskell.org/) and
@@ -11,7 +13,7 @@ top of [Haskell](https://www.haskell.org/) and
 [Emacs](https://www.gnu.org/software/emacs/) as my editor so there
 will be some later blog posts explaining how to set that up.
 
-Nix is the starting point and for learning Nix, I recommend the [Nix
+Nix is where we will start and for learning Nix, I recommend the [Nix
 pills](https://nixos.org/guides/nix-pills/index.html). I thought I
 could simply find example snippets online and learn from that but the
 language and the conventions were too alien for me to understand
@@ -22,13 +24,13 @@ post](https://robertwpearce.com/hakyll-pt-6-pure-builds-with-nix.html)
 from Robert Pearce to set things up. I removed the `niv` part as I am
 not using it.
 
-There was an encoding bug as my files are using UTF-8 but by default
-Hakyll only understands ASCII encoding. To solve that one, I followed
-[this blog
+There was an encoding bug as I'm using UTF-8 but by default Hakyll
+only understands ASCII encoding. To solve that one, I followed [this
+blog
 post](https://www.slamecka.cz/posts/2020-06-08-encoding-issues-with-nix-hakyll/)
 from Ondřej Slámečka. There is a fix in the [Hakyll's
 FAQ](https://jaspervdj.be/hakyll/tutorials/faq.html#hgetcontents-invalid-argument-or-commitbuffer-invalid-argument),
-but the post from Ondřej is tailored for nix so I followed that one.
+but the post from Ondřej is tailored for nix so I followed it.
 
 I recommend reading both blog posts as they explain things well. That
 said, here is my version.
@@ -131,8 +133,8 @@ haskellPackages = pkgs.haskell.packages.${compiler}.override {
 
 First, for Hakyll, we configure it with `watchServer` and
 `previewServer` options. Both options are super useful when developing
-as the produced executable will watch for file changes and rebuild the
-blog post when needed.
+as the produced `./result/bin/site` executable will watch for file
+changes and rebuild the blog post when needed.
 
 ``` nix
 hakyll =
@@ -144,9 +146,8 @@ hakyll =
 ```
 
 Second, we create a variable `hakyll-blog` to compile the blog. The
-name `"blog"` is the name I will use later when generating the Hakyll
-site. It must correspond to the `executable site` line in the
-generated cabal file. (This will be generated later). We also set some
+name `"blog"` must correspond to the `executable <NAME>` line in the
+generated cabal file, which we will generate later. We also set some
 flags to make Hakyll able to read UTF-8 files.
 
 ``` nix
@@ -171,8 +172,8 @@ in
   project = project;
 ```
 
-Finally, we set the shell and provide some packages useful for
-editors, namely `ghcide`, `brittany`, `hlint` and a local `hoogle`
+Finally, we set the `shell` variable and provide some packages useful
+for editors, namely `ghcide`, `brittany`, `hlint` and a local `hoogle`
 with `withHoogle`:
 
 ``` nix
@@ -194,25 +195,37 @@ shell = haskellPackages.shellFor {
 
 Corresponds to [this commit](https://github.com/ibizaman/blog/commit/990cea6051a978ca407ff2ed3921d7deb3652e5c).
 
-We still need one more empty `haskyll.patch` which is empty for now.
+Create an empty `hakyll.patch` file. We will not use it but it's nice
+to have it if you want to patch Hakyll.
 
-This will take some time because we will run Nix for the first time on
-our blog. It will fetch and compile everything needed. It took roughly
-1 hour on my laptop.
+Next step will take some time because we will run Nix for the first
+time. It will fetch and compile every dependencies. It took roughly 1
+hour on my laptop.
 
 ``` bash
 $ nix-shell --pure -p haskellPackages.hakyll --run "hakyll-init ."
 ```
 
-You get a bunch of files and 4 example blog posts under `posts/`.
+You get a bunch of files and 4 example blog posts under the `posts/`
+directory.
 
-Then, we can build the blog executable:
+Then, we can build the `./result/bin/site` blog executable:
 
 ``` bash
 $ nix-build --show-trace
 ```
 
-Finally, we can run the executable. It will compile all 4 example blog posts:
+Finally, we can run the executable to compile the site, including all
+4 example blog posts:
+
+``` bash
+./result/bin/site build
+```
+
+This will create the `_cache` and `_site` directories. The latter is
+where the generated files will be located.
+
+# Serve and Watch For Changes
 
 ``` bash
 ./result/bin/site watch
@@ -239,13 +252,15 @@ _site/
 result
 ```
 
-The first two lines are for emacs temporary files, you could omit
+The first two lines are for Emacs' temporary files, you could omit
 them.
 
 # Your First Post
 
-This will different for you but I just deleted all 4 example blog posts and [wrote another post](https://github.com/ibizaman/blog/commit/b8f97be67e44bb811524d7235414f8d8899281d5).
+I just deleted all 4 example blog posts and [created another
+file](https://github.com/ibizaman/blog/commit/b8f97be67e44bb811524d7235414f8d8899281d5).
 
 # Conclusion
 
-That's it, we created our blog with Hakyll and Nix and we can see it locally. Next up, let's publish it.
+That's it, we created our blog with Hakyll and Nix and we can see it
+locally. Next up, let's publish it.
