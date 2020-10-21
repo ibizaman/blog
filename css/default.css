@@ -5,10 +5,21 @@ html {
 body {
   font-size: 1.6rem;
   color: #000;
+  background-color: #cdb79e;
 }
 
 header {
-  border-bottom: 0.2rem solid #000;
+  font-family: monospace;
+  border-bottom: 0.2rem dashed #8b7d6b;
+}
+
+.logo a {
+  font-weight: bold;
+  color: #458b74;
+  text-decoration: none;
+}
+.logo a:visited {
+  color: #458b74;
 }
 
 nav {
@@ -18,25 +29,39 @@ nav {
 nav a {
   font-size: 1.8rem;
   font-weight: bold;
-  color: black;
+  color: #698b69;
   text-decoration: none;
   text-transform: uppercase;
+}
+nav a:visited{
+  color: #698b69;
 }
 
 footer {
   margin-top: 3rem;
   padding: 1.2rem 0;
-  border-top: 0.2rem solid #000;
+  border-top: 0.2rem solid #8b7d6b;
   font-size: 1.2rem;
   color: #555;
 }
 
+main {
+  background-color: #ffe4c4;
+  border-radius: 15px;
+  padding: 0.1rem 1.2rem;
+}
+
 h1 {
   font-size: 2.4rem;
+  color: #458b74;
 }
 
 h2 {
-  font-size: 2rem;
+  color: #458b74;
+}
+
+article {
+  padding: 1.2rem 1.2rem;
 }
 
 article .header {
@@ -45,10 +70,23 @@ article .header {
   color: #555;
 }
 
-.logo a {
-  font-weight: bold;
-  color: #000;
-  text-decoration: none;
+article h1 {
+  font-size: 2.4rem;
+  padding: 0.5rem 1.2rem;
+  border-bottom: 0.2rem solid #404040;
+}
+
+article h2 {
+  font-size: 2rem;
+  margin: 0 2.4rem;
+  border-bottom: 0.2rem solid #404040;
+}
+
+a {
+  color: #6e8b3d;
+}
+a:visited{
+  color: #6e8b3d;
 }
 
 @media (max-width: 319px) {
