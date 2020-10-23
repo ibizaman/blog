@@ -1,5 +1,6 @@
 ---
 title: Add Syntax Highlighting
+tags: hakyll
 ---
 
 This is "just" a matter of creating a CSS file and adding it to the

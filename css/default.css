@@ -70,6 +70,12 @@ article .header {
   color: #555;
 }
 
+article .tags {
+  font-size: 1.4rem;
+  font-style: italic;
+  color: #555;
+}
+
 article h1 {
   font-size: 2.4rem;
   padding: 0.5rem 1.2rem;
@@ -87,6 +93,10 @@ a {
 }
 a:visited{
   color: #6e8b3d;
+}
+
+div.tags {
+  text-align: right;
 }
 
 @media (max-width: 319px) {

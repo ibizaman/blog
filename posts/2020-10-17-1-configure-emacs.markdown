@@ -1,5 +1,6 @@
 ---
 title: Configure Emacs to Write this Blog With Nix
+tags: hakyll, haskell, nix, emacs, lsp
 ---
 
 We need to make Emacs support Haskell through Nix. It will use

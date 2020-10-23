@@ -1,5 +1,6 @@
 ---
 title: Deploy the Blog to GitHub Pages
+tags: hakyll, haskell, nix
 ---
 
 I want to use GitHub Pages because it is integrated with GitHub and it

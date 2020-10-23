@@ -1,5 +1,6 @@
 ---
 title: First Post
+tags: misc
 ---
 
 I wanted to start writing a blog since a long time. I like sharing my

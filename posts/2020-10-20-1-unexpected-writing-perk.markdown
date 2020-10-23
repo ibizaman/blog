@@ -1,5 +1,6 @@
 ---
 title: Unexpected Writing Perk
+tags: misc
 ---
 
 It's kind of obvious in retrospective, but I try to pay attention when
