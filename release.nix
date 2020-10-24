@@ -5,15 +5,14 @@
 
 let
   inherit (pkgs.lib.trivial) flip pipe;
-  inherit (pkgs.haskell.lib) appendPatch appendConfigureFlags;
+  inherit (pkgs.haskell.lib) appendConfigureFlags;
 
   haskellPackages = pkgs.haskell.packages.${compiler}.override {
     overrides = hpNew: hpOld: {
       hakyll =
         pipe
            hpOld.hakyll
-           [ (flip appendPatch ./hakyll.patch)
-             (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
+           [ (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
            ];
 
       # https://www.slamecka.cz/posts/2020-06-08-encoding-issues-with-nix-hakyll/

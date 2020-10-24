@@ -65,15 +65,14 @@ the base site.
 
 let
   inherit (pkgs.lib.trivial) flip pipe;
-  inherit (pkgs.haskell.lib) appendPatch appendConfigureFlags;
+  inherit (pkgs.haskell.lib) appendConfigureFlags;
 
   haskellPackages = pkgs.haskell.packages.${compiler}.override {
     overrides = hpNew: hpOld: {
       hakyll =
         pipe
            hpOld.hakyll
-           [ (flip appendPatch ./hakyll.patch)
-             (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
+           [ (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
            ];
 
       # https://www.slamecka.cz/posts/2020-06-08-encoding-issues-with-nix-hakyll/
@@ -122,7 +121,7 @@ First, we set some defaults and import some functions:
 
 let
   inherit (pkgs.lib.trivial) flip pipe;
-  inherit (pkgs.haskell.lib) appendPatch appendConfigureFlags;
+  inherit (pkgs.haskell.lib) appendConfigureFlags;
 ```
 
 Then we set some overrides:
@@ -141,8 +140,7 @@ changes and rebuild the blog post when needed.
 hakyll =
   pipe
      hpOld.hakyll
-     [ (flip appendPatch ./hakyll.patch)
-       (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
+     [ (flip appendConfigureFlags [ "-f" "watchServer" "-f" "previewServer" ])
      ];
 ```
 
@@ -195,9 +193,6 @@ shell = haskellPackages.shellFor {
 # Generate the Initial Template Blog
 
 Corresponds to [this commit](https://github.com/ibizaman/blog/commit/990cea6051a978ca407ff2ed3921d7deb3652e5c).
-
-Create an empty `hakyll.patch` file. We will not use it but it's nice
-to have it if you want to patch Hakyll.
 
 Next step will take some time because we will run Nix for the first
 time. It will fetch and compile every dependencies. It took roughly 1
