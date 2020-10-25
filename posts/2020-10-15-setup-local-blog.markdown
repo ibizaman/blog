@@ -14,11 +14,11 @@ top of [Haskell](https://www.haskell.org/) and
 [Emacs](https://www.gnu.org/software/emacs/) as my editor so there
 will be some later blog posts explaining how to set that up.
 
-Nix is where we will start and for learning Nix, I recommend the [Nix
-pills](https://nixos.org/guides/nix-pills/index.html). I thought I
-could simply find example snippets online and learn from that but the
-language and the conventions were too alien for me to understand
-anything.
+We will start by writing Nix files and for learning Nix, I recommend
+the [Nix pills](https://nixos.org/guides/nix-pills/index.html). I
+thought I could simply find example snippets online and learn from
+that but the language and the conventions were too alien for me to
+understand anything.
 
 I followed [this blog
 post](https://robertwpearce.com/hakyll-pt-6-pure-builds-with-nix.html)
@@ -40,8 +40,8 @@ said, here is my version.
 
 Corresponds to [this commit](https://github.com/ibizaman/blog/commit/b4200e564d8464f6783a38a14e8be059ef28b425).
 
-There are 3 nix files to create, then we will use hakyll to generate
-the base site.
+There are 3 nix files to create, then we will be able to use
+`hakyll-init` to generate the base site.
 
 ## `./default.nix`
 
@@ -124,14 +124,15 @@ let
   inherit (pkgs.haskell.lib) appendConfigureFlags;
 ```
 
-Then we set some overrides:
+Then we set some overrides. To know what an override is, check the
+[Nix pills](https://nixos.org/guides/nix-pills/override-design-pattern.html).
 
 ``` nix
 haskellPackages = pkgs.haskell.packages.${compiler}.override {
   overrides = hpNew: hpOld: {
 ```
 
-First, for Hakyll, we configure it with `watchServer` and
+First for Hakyll, we configure it with `watchServer` and
 `previewServer` options. Both options are super useful when developing
 as the produced `./result/bin/site` executable will watch for file
 changes and rebuild the blog post when needed.
@@ -145,9 +146,9 @@ hakyll =
 ```
 
 Second, we create a variable `hakyll-blog` to compile the blog. The
-name `"blog"` must correspond to the `executable <NAME>` line in the
-generated cabal file, which we will generate later. We also set some
-flags to make Hakyll able to read UTF-8 files.
+name `"blog"` must correspond to the name of the cabal file, which we
+will generate later. We also set some flags to make Hakyll able to
+read UTF-8 files.
 
 ``` nix
 hakyll-blog = (hpNew.callCabal2nix "blog" ./. { }).overrideAttrs (old: {
@@ -202,8 +203,37 @@ hour on my laptop.
 $ nix-shell --pure -p haskellPackages.hakyll --run "hakyll-init ."
 ```
 
+This will generate a cabal file named after the git repo's directory. Here is an example, with the following directory structure:
+```
+./blog
+./blog/.git
+```
+
+Running the `hakyll-init .` command in the `blog` directory will create the following files:
+
+``` bash
+[nix-shell:~/blog]$ hakyll-init .
+Creating ./posts/2015-11-28-carpe-diem.markdown
+Creating ./posts/2015-10-07-rosa-rosa-rosam.markdown
+Creating ./posts/2015-12-07-tu-quoque.markdown
+Creating ./posts/2015-08-12-spqr.markdown
+Creating ./site.hs
+Creating ./images/haskell-logo.png
+Creating ./templates/post-list.html
+Creating ./templates/default.html
+Creating ./templates/archive.html
+Creating ./templates/post.html
+Creating ./css/default.css
+Creating ./index.html
+Creating ./about.rst
+Creating ./contact.markdown
+Creating ./blog.cabal
+```
+
 You get a bunch of files and 4 example blog posts under the `posts/`
-directory.
+directory. Also, the Cabal file `blog.cabal` is named from the
+directory and must be named that way for the `release.nix` file to
+work correctly, as we established previously.
 
 Then, we can build the `./result/bin/site` blog executable:
 
@@ -229,7 +259,7 @@ where the generated files will be located.
 
 Your blog will be up and running at [http://localhost:8000](http://localhost:8000).
 
-You can change posts, and or remove then, change the css and other
+You can change posts, add or remove posts, change the css and other
 files and the `site` executable will see those changes and rebuild the
 site. You just need to reload the site in your browser.
 

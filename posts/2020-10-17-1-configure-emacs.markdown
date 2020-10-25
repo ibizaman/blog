@@ -3,30 +3,30 @@ title: Configure Emacs to Write this Blog With Nix
 tags: hakyll, haskell, nix, emacs, lsp
 ---
 
-We need to make Emacs support Haskell through Nix. It will use
-[LSP](https://microsoft.github.io/language-server-protocol/) through
-[Ghcide](https://github.com/haskell/ghcide/) as basis to parse the
-source code, [Flycheck](https://www.flycheck.org/en/latest/) for live
-errors in the buffer and format the code through
-[Brittany](https://hackage.haskell.org/package/brittany). Ghcide and
-Brittany are installed with [Nix](https://nixos.org/).
+We need to make Emacs find Haskell executables through Nix. It will
+use [LSP](https://microsoft.github.io/language-server-protocol/) with
+the [Ghcide](https://github.com/haskell/ghcide/) LSP server as basis
+to parse the source code,
+[Flycheck](https://www.flycheck.org/en/latest/) for live errors in the
+buffer and [Brittany](https://hackage.haskell.org/package/brittany) to
+format the code. Ghcide and Brittany are installed with
+[Nix](https://nixos.org/).
 
-To make Emacs work with Haskell being compiled through Nix, we will
-use the following packages:
+To make all this work, we will use the following Emacs packages:
 
-- [`nix-sandbox`](https://github.com/travisbhartwell/nix-emacs/#nix-sandbox) will provide us with helper functions to get the current project's nix sandbox.
-- [`lsp-mode`](https://emacs-lsp.github.io/lsp-mode)
-- [`lsp-ui`](https://github.com/emacs-lsp/lsp-ui)
-- [`company-lsp`](https://github.com/tigersoldier/company-lsp)
-- [`lsp-haskell`](https://github.com/emacs-lsp/lsp-haskell)
-- [`haskell-mode`](https://haskell.github.io/haskell-mode)
-- [`flycheck`](https://www.flycheck.org/)
-
-Optionally, I recommend `nix-mode` to edit Nix files.
+- [`nix-sandbox`](https://github.com/travisbhartwell/nix-emacs/#nix-sandbox) provides us with helper functions to get the current project's nix sandbox.
+- [`nix-mode`](https://github.com/NixOS/nix-mode) makes it easy to edix `.nix` files as well as provides the `nix-build` function.
+- [`lsp-mode`](https://emacs-lsp.github.io/lsp-mode) handles talking to a LSP server, here Ghcide.
+- [`lsp-ui`](https://github.com/emacs-lsp/lsp-ui) shows LSP actions and various infos.
+- [`company-lsp`](https://github.com/tigersoldier/company-lsp) provides autocompletion based on the LSP server.
+- [`lsp-haskell`](https://github.com/emacs-lsp/lsp-haskell) is used by `lsp-mode` to talk to Ghcide.
+- [`haskell-mode`](https://haskell.github.io/haskell-mode) provides syntax highlighting, hoogle integration and much more for editing Haskell files.
+- [`flycheck`](https://www.flycheck.org/) provides syntax check highlighting.
 
 By the way, I'm using
 [use-package](https://github.com/jwiegley/use-package) with
-[straight](https://github.com/raxod502/straight.el).
+[straight](https://github.com/raxod502/straight.el) to configure
+Emacs.
 
 Finally, to make this work with Emacs running as a daemon, there will
 be some systemd-fu required.
@@ -49,8 +49,9 @@ We add `nix-sandbox` and `nix-mode`:
 ```
 
 `nix-sandbox` defines `nix-current-sandbox` which returns the path to
-`shell.nix` or if it does not exist to `default.nix` or `nil` if none
-exist. It also defines `nix-shell-command` which, from the docs:
+`shell.nix` if it exists, or falls back to `default.nix` if it exists
+or `nil` if none exist. It also defines `nix-shell-command` which,
+from the docs:
 
 > ``` commonlisp
 > (defun nix-shell-command (sandbox &rest args)
@@ -59,13 +60,13 @@ exist. It also defines `nix-shell-command` which, from the docs:
 > ```
 
 Super useful for running `brittany` or `ghcide` inside our Nix
-environment.
+environment. We won't need to run those manually though.
 
 Another useful function is `nix-compile` which interactively asks for
 a sandbox and a command to run.
 
-We add `nix-mode` for its `nix-build` function. This allows us to
-build the site executable.
+We add `nix-mode` mostly for its `nix-build` function. This allows us
+to build the site executable from Emacs.
 
 ## lsp-mode, lsp-ui, company-lsp
 
@@ -150,8 +151,9 @@ Haskell-mode is used to edit haskell source code.
 The advanced configuration is for handling `hoogle` and `brittany`
 inside Nix. In both cases, we use buffer-local variables through the
 `haskell-mode` hook and always check if we are in a Nix environment.
-If we are, then we use `nix-sandbox`'s helpers to wrap around the
-`hoogle` and `brittany` executables.
+If we are, that is if `(nix-current-sandbox)` is not `nil`, then we
+use `nix-sandbox`'s helpers to wrap around the `hoogle` and `brittany`
+executables. If not, we directly call `hoogle` and `brittany`.
 
 To search in the local database, we can then use
 `haskell-hoogle-lookup-from-local`. On first call, it will start the
@@ -180,6 +182,29 @@ Now we setup the package that talks to Ghcide, our LSP server.
 		(apply 'nix-shell-command sandbox args)
 	  args))
 
+  (setq lsp-haskell-process-path-hie "ghcide"
+		lsp-haskell-process-args-hie '()
+		lsp-haskell-process-wrapper-function 'my/nix--lsp-haskell-wrapper))
+```
+
+Like for haskell-mode, the advanced configuration is focused on
+wrapping the various commands with `nix-shell-command` and
+`nix-shell-string`, with the wrapper being a pass-through if
+`(nix-current-sandbox)` returns `nil`.
+
+## Flycheck
+
+Finally, we configure `flycheck` itself. Like for `lsp-haskell`, we
+make it so `flycheck` can talk to Ghcide through Nix.
+
+``` commonlisp
+(use-package flycheck
+  :straight t
+  :after nix-sandbox
+
+  :init
+  (add-hook 'after-init-hook 'global-flycheck-mode)
+
   ;; from https://github.com/travisbhartwell/nix-emacs#flycheck
   (defun my/nix--flycheck-command-wrapper (command)
 	(if-let ((sandbox (nix-current-sandbox)))
@@ -190,34 +215,12 @@ Now we setup the package that talks to Ghcide, our LSP server.
 		(nix-executable-find (nix-current-sandbox) cmd)
 	  (flycheck-default-executable-find cmd)))
 
-  (setq lsp-haskell-process-path-hie "ghcide"
-		lsp-haskell-process-args-hie '()
-		lsp-haskell-process-wrapper-function 'my/nix--lsp-haskell-wrapper
-		flycheck-command-wrapper-function 'my/nix--flycheck-command-wrapper
-		flycheck-executable-find 'my/nix--flycheck-executable-find))
-```
-
-Like for haskell-mode, the advanced configuration is focused on
-wrapping the various commands with `nix-shell-command` and
-`nix-shell-string`, with the wrapper being a pass-through if
-`(nix-current-sandbox)` returns `nil`.
-
-We make it so Flycheck talks to Ghcide inside the Nix environment.
-
-# Flycheck
-
-Finally, we configure flycheck itself. There is nothing tied to Nix or
-any other package we talked about but I still reproduced my config
-here for completeness.
-
-``` commonlisp
-(use-package flycheck
-  :straight t
-  :init
-  (add-hook 'after-init-hook 'global-flycheck-mode)
   :config
   (setq flycheck-check-syntax-automatically '(save idle-change)
-		flycheck-relevant-error-other-file-show nil)
+		flycheck-relevant-error-other-file-show nil
+		flycheck-command-wrapper-function 'my/nix--flycheck-command-wrapper
+		flycheck-executable-find 'my/nix--flycheck-executable-find)
+
   (add-to-list 'display-buffer-alist
 			   `(,(rx bos "*Flycheck errors*" eos)
 				 (display-buffer-reuse-window
@@ -227,6 +230,33 @@ here for completeness.
 				 (window-height   . 0.33))))
 ```
 
+# Systemd-fu for Emacs Daemon
+
+I will assume you use systemd to start emacs in daemon mode. If so,
+create or update the `~/.config/systemd/user/emacs.service` file with
+the same `NIX_*` and `PATH` `Environment` fields:
+
+``` ini
+[Unit]
+Description=Emacs text editor
+Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/emacs --daemon
+ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
+Environment=NIX_PROFILES=/nix/var/nix/profiles/default %h/.nix-profile
+Environment=NIX_PATH=%h/.nix-defexpr/channels
+Environment=NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+Environment=PATH=%h/.nix-profile/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
 # Conclusion
 
 That's it, you should be well equipped for editing your site.
+Actually, everything we saw here is transferable to any Haskell code
+running through Nix.
