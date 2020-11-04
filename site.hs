@@ -1,12 +1,15 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Maybe                     ( catMaybes
+import           Data.Maybe                     ( maybeToList
+                                                , listToMaybe
+                                                , catMaybes
                                                 , fromMaybe
                                                 )
 import           Data.Monoid                    ( mappend )
 import           Hakyll
-import           Control.Monad                  ( forM_
+import           Control.Monad                  ( join
+                                                , forM_
                                                 , foldM
                                                 , mplus
                                                 , forM
@@ -129,6 +132,25 @@ main = hakyllWith conf $ do
         >>= loadAndApplyTemplate "templates/default.html" tagsCtx
         >>= relativizeUrls
 
+  create ["series.html"] $ do
+    route idRoute
+    compile $ do
+      series' <- seriesMetadata serie
+      let seriesCtx =
+            listField
+                "series"
+                (  field "name"  (return . serieName . itemBody)
+                <> field "url"   (return . serieUrl . itemBody)
+                <> field "count" (return . show . serieCount . itemBody)
+                )
+                (sequence $ map makeItem series')
+              `mappend` defaultContext
+
+      getResourceBody
+        >>= applyAsTemplate seriesCtx
+        >>= loadAndApplyTemplate "templates/default.html" seriesCtx
+        >>= relativizeUrls
+
   match "index.html" $ do
     route idRoute
     compile $ do
@@ -161,10 +183,21 @@ data TagMetadata = TagMetadata
 
 tagsMetadata :: Tags -> Compiler [TagMetadata]
 tagsMetadata tags = do
-  let tagsList = map fst $ tagsMap tags
   forM (tagsMap tags) $ \(tag, ids) -> do
     route' <- getRoute $ tagsMakeId tags tag
     return $ TagMetadata tag (fromMaybe "/" route') (length ids)
+
+data SerieMetadata = SerieMetadata
+         { serieName :: String
+         , serieUrl :: String
+         , serieCount :: Int
+         }
+
+seriesMetadata :: Series -> Compiler [SerieMetadata]
+seriesMetadata series = do
+  forM (seriesMap series) $ \(serie, ids) -> do
+    route' <- getRoute $ seriesMakeId series serie
+    return $ SerieMetadata serie (fromMaybe "/" route') (length ids)
 
 
 --------------------------------------------------------------------------------
@@ -179,20 +212,17 @@ data Series = Series
 --------------------------------------------------------------------------------
 -- | Obtain series from a page in the default way: parse them from the @series@
 -- metadata field. This can either be a list or a comma-separated string.
-getSeries :: MonadMetadata m => Identifier -> m [String]
-getSeries identifier = do
+getSerie :: MonadMetadata m => Identifier -> m (Maybe String)
+getSerie identifier = do
   metadata <- getMetadata identifier
-  return
-    $       fromMaybe []
-    $       (lookupStringList "series" metadata)
-    `mplus` (map trim . splitAll "," <$> lookupString "series" metadata)
+  return $ trim <$> lookupString "series" metadata
 
 
 --------------------------------------------------------------------------------
 -- | Higher-order function to read series
 buildSeriesWith
   :: MonadMetadata m
-  => (Identifier -> m [String])
+  => (Identifier -> m (Maybe String))
   -> Pattern
   -> (String -> Identifier)
   -> m Series
@@ -205,19 +235,13 @@ buildSeriesWith f pattern makeId = do
     -- Create a serie map for one page
   addSeries serieMap id' = do
     series <- f id'
-    let serieMap' = M.fromList $ zip series $ repeat [id']
+    let serieMap' = M.fromList $ maybeToList $ fmap (\s -> (s, [id'])) series
     return $ M.unionWith (++) serieMap serieMap'
 
 
 --------------------------------------------------------------------------------
 buildSeries :: MonadMetadata m => Pattern -> (String -> Identifier) -> m Series
-buildSeries = buildSeriesWith getSeries
-
-
---------------------------------------------------------------------------------
-buildCategories
-  :: MonadMetadata m => Pattern -> (String -> Identifier) -> m Series
-buildCategories = buildSeriesWith getCategory
+buildSeries = buildSeriesWith getSerie
 
 
 --------------------------------------------------------------------------------
@@ -231,135 +255,135 @@ seriesRules series rules = forM_ (seriesMap series) $ \(serie, identifiers) ->
 
 --------------------------------------------------------------------------------
 -- | Render series in HTML (the flexible higher-order function)
-renderSeries
-  :: (String -> String -> Int -> Int -> Int -> String)
-           -- ^ Produce a serie item: serie, url, count, min count, max count
-  -> ([String] -> String)
-           -- ^ Join items
-  -> Series
-           -- ^ Serie cloud renderer
-  -> Compiler String
-renderSeries makeHtml concatHtml series = do
-    -- In series' we create a list: [((serie, route), count)]
-  series' <- forM (seriesMap series) $ \(serie, ids) -> do
-    route' <- getRoute $ seriesMakeId series serie
-    return ((serie, route'), length ids)
-
-  -- TODO: We actually need to tell a dependency here!
-
-  let -- Absolute frequencies of the pages
-      freqs = map snd series'
-
-      -- The minimum and maximum count found
-      (min', max') | null freqs = (0, 1)
-                   | otherwise  = (minimum &&& maximum) freqs
-
-      -- Create a link for one item
-      makeHtml' ((serie, url), count) =
-        makeHtml serie (toUrl $ fromMaybe "/" url) count min' max'
-
-  -- Render and return the HTML
-  return $ concatHtml $ map makeHtml' series'
-
-
---------------------------------------------------------------------------------
--- | Render a serie cloud in HTML
-renderSerieCloud
-  :: Double
-               -- ^ Smallest font size, in percent
-  -> Double
-               -- ^ Biggest font size, in percent
-  -> Series
-               -- ^ Input series
-  -> Compiler String
-               -- ^ Rendered cloud
-renderSerieCloud = renderSerieCloudWith makeLink (intercalate " ")
- where
-  makeLink minSize maxSize serie url count min' max' =
-      -- Show the relative size of one 'count' in percent
-    let diff     = 1 + fromIntegral max' - fromIntegral min'
-        relative = (fromIntegral count - fromIntegral min') / diff
-        size     = floor $ minSize + relative * (maxSize - minSize) :: Int
-    in  renderHtml
-          $ H.a
-          ! A.style (toValue $ "font-size: " ++ show size ++ "%")
-          ! A.href (toValue url)
-          $ toHtml serie
+-- renderSeries
+--   :: (String -> String -> Int -> Int -> Int -> String)
+--            -- ^ Produce a serie item: serie, url, count, min count, max count
+--   -> ([String] -> String)
+--            -- ^ Join items
+--   -> Series
+--            -- ^ Serie cloud renderer
+--   -> Compiler String
+-- renderSeries makeHtml concatHtml series = do
+--     -- In series' we create a list: [((serie, route), count)]
+--   series' <- forM (seriesMap series) $ \(serie, ids) -> do
+--     route' <- getRoute $ seriesMakeId series serie
+--     return ((serie, route'), length ids)
+--
+--   -- TODO: We actually need to tell a dependency here!
+--
+--   let -- Absolute frequencies of the pages
+--       freqs = map snd series'
+--
+--       -- The minimum and maximum count found
+--       (min', max') | null freqs = (0, 1)
+--                    | otherwise  = (minimum &&& maximum) freqs
+--
+--       -- Create a link for one item
+--       makeHtml' ((serie, url), count) =
+--         makeHtml serie (toUrl $ fromMaybe "/" url) count min' max'
+--
+--   -- Render and return the HTML
+--   return $ concatHtml $ map makeHtml' series'
 
 
 --------------------------------------------------------------------------------
 -- | Render a serie cloud in HTML
-renderSerieCloudWith
-  :: (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
-                   -- ^ Render a single serie link
-  -> ([String] -> String)
-                   -- ^ Concatenate links
-  -> Double
-                   -- ^ Smallest font size, in percent
-  -> Double
-                   -- ^ Biggest font size, in percent
-  -> Series
-                   -- ^ Input series
-  -> Compiler String
-                   -- ^ Rendered cloud
-renderSerieCloudWith makeLink cat minSize maxSize =
-  renderSeries (makeLink minSize maxSize) cat
+-- renderSerieCloud
+--   :: Double
+--                -- ^ Smallest font size, in percent
+--   -> Double
+--                -- ^ Biggest font size, in percent
+--   -> Series
+--                -- ^ Input series
+--   -> Compiler String
+--                -- ^ Rendered cloud
+-- renderSerieCloud = renderSerieCloudWith makeLink (intercalate " ")
+--  where
+--   makeLink minSize maxSize serie url count min' max' =
+--       -- Show the relative size of one 'count' in percent
+--     let diff     = 1 + fromIntegral max' - fromIntegral min'
+--         relative = (fromIntegral count - fromIntegral min') / diff
+--         size     = floor $ minSize + relative * (maxSize - minSize) :: Int
+--     in  renderHtml
+--           $ H.a
+--           ! A.style (toValue $ "font-size: " ++ show size ++ "%")
+--           ! A.href (toValue url)
+--           $ toHtml serie
+
+
+--------------------------------------------------------------------------------
+-- | Render a serie cloud in HTML
+-- renderSerieCloudWith
+--   :: (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
+--                    -- ^ Render a single serie link
+--   -> ([String] -> String)
+--                    -- ^ Concatenate links
+--   -> Double
+--                    -- ^ Smallest font size, in percent
+--   -> Double
+--                    -- ^ Biggest font size, in percent
+--   -> Series
+--                    -- ^ Input series
+--   -> Compiler String
+--                    -- ^ Rendered cloud
+-- renderSerieCloudWith makeLink cat minSize maxSize =
+--   renderSeries (makeLink minSize maxSize) cat
 
 
 --------------------------------------------------------------------------------
 -- | Render a serie cloud in HTML as a context
-serieCloudField
-  :: String
-               -- ^ Destination key
-  -> Double
-               -- ^ Smallest font size, in percent
-  -> Double
-               -- ^ Biggest font size, in percent
-  -> Series
-               -- ^ Input series
-  -> Context a
-               -- ^ Context
-serieCloudField key minSize maxSize series =
-  field key $ \_ -> renderSerieCloud minSize maxSize series
+-- serieCloudField
+--   :: String
+--                -- ^ Destination key
+--   -> Double
+--                -- ^ Smallest font size, in percent
+--   -> Double
+--                -- ^ Biggest font size, in percent
+--   -> Series
+--                -- ^ Input series
+--   -> Context a
+--                -- ^ Context
+-- serieCloudField key minSize maxSize series =
+--   field key $ \_ -> renderSerieCloud minSize maxSize series
 
 
 --------------------------------------------------------------------------------
 -- | Render a serie cloud in HTML as a context
-serieCloudFieldWith
-  :: String
-                  -- ^ Destination key
-  -> (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
-                  -- ^ Render a single serie link
-  -> ([String] -> String)
-                  -- ^ Concatenate links
-  -> Double
-                  -- ^ Smallest font size, in percent
-  -> Double
-                  -- ^ Biggest font size, in percent
-  -> Series
-                  -- ^ Input series
-  -> Context a
-                  -- ^ Context
-serieCloudFieldWith key makeLink cat minSize maxSize series =
-  field key $ \_ -> renderSerieCloudWith makeLink cat minSize maxSize series
+-- serieCloudFieldWith
+--   :: String
+--                   -- ^ Destination key
+--   -> (Double -> Double -> String -> String -> Int -> Int -> Int -> String)
+--                   -- ^ Render a single serie link
+--   -> ([String] -> String)
+--                   -- ^ Concatenate links
+--   -> Double
+--                   -- ^ Smallest font size, in percent
+--   -> Double
+--                   -- ^ Biggest font size, in percent
+--   -> Series
+--                   -- ^ Input series
+--   -> Context a
+--                   -- ^ Context
+-- serieCloudFieldWith key makeLink cat minSize maxSize series =
+--   field key $ \_ -> renderSerieCloudWith makeLink cat minSize maxSize series
 
 
 --------------------------------------------------------------------------------
 -- | Render a simple serie list in HTML, with the serie count next to the item
 -- TODO: Maybe produce a Context here
-renderSerieList :: Series -> Compiler (String)
-renderSerieList = renderSeries makeLink (intercalate ", ")
- where
-  makeLink serie url count _ _ =
-    renderHtml $ H.a ! A.href (toValue url) $ toHtml
-      (serie ++ " (" ++ show count ++ ")")
+-- renderSerieList :: Series -> Compiler (String)
+-- renderSerieList = renderSeries makeLink (intercalate ", ")
+--  where
+--   makeLink serie url count _ _ =
+--     renderHtml $ H.a ! A.href (toValue url) $ toHtml
+--       (serie ++ " (" ++ show count ++ ")")
 
 
 --------------------------------------------------------------------------------
 -- | Render series with links with custom functions to get series and to
 -- render links
 seriesFieldWith
-  :: (Identifier -> Compiler [String])
+  :: (Identifier -> Compiler (Maybe String))
               -- ^ Get the series
   -> (String -> (Maybe FilePath) -> Maybe H.Html)
               -- ^ Render link for one serie
@@ -372,12 +396,12 @@ seriesFieldWith
   -> Context a
               -- ^ Resulting context
 seriesFieldWith getSeries' renderLink cat key series = field key $ \item -> do
-  series' <- getSeries' $ itemIdentifier item
-  links   <- forM series' $ \serie -> do
+  series'                 <- getSeries' $ itemIdentifier item
+  (links :: Maybe H.Html) <- fmap join $ forM series' $ \serie -> do
     route' <- getRoute $ seriesMakeId series serie
     return $ renderLink serie route'
 
-  return $ renderHtml $ cat $ catMaybes $ links
+  return $ renderHtml $ cat $ maybeToList links
 
 
 --------------------------------------------------------------------------------
@@ -387,17 +411,7 @@ seriesField
   -> Series       -- ^ Series
   -> Context a  -- ^ Context
 seriesField =
-  seriesFieldWith getSeries simpleRenderLink (mconcat . intersperse ", ")
-
-
---------------------------------------------------------------------------------
--- | Render the category in a link
-categoryField
-  :: String     -- ^ Destination key
-  -> Series       -- ^ Series
-  -> Context a  -- ^ Context
-categoryField =
-  seriesFieldWith getCategory simpleRenderLink (mconcat . intersperse ", ")
+  seriesFieldWith getSerie simpleRenderLink (mconcat . intersperse ", ")
 
 
 --------------------------------------------------------------------------------
@@ -415,11 +429,11 @@ simpleRenderLink serie (Just filePath) =
 --------------------------------------------------------------------------------
 -- | Sort series using supplied function. First element of the tuple passed to
 -- the comparing function is the actual serie name.
-sortSeriesBy
-  :: ((String, [Identifier]) -> (String, [Identifier]) -> Ordering)
-  -> Series
-  -> Series
-sortSeriesBy f t = t { seriesMap = sortBy f (seriesMap t) }
+-- sortSeriesBy
+--   :: ((String, [Identifier]) -> (String, [Identifier]) -> Ordering)
+--   -> Series
+--   -> Series
+-- sortSeriesBy f t = t { seriesMap = sortBy f (seriesMap t) }
 
 
 --------------------------------------------------------------------------------
