@@ -154,9 +154,18 @@ main = hakyllWith conf $ do
   match "index.html" $ do
     route idRoute
     compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
+      series' <- seriesMetadata serie
+      posts   <- recentFirst =<< loadAll "posts/*"
       let indexCtx =
             listField "posts" postCtxWithTags (return posts)
+              `mappend` listField
+                          "series"
+                          (  field "name" (return . serieName . itemBody)
+                          <> field "url"  (return . serieUrl . itemBody)
+                          <> field "count"
+                                   (return . show . serieCount . itemBody)
+                          )
+                          (sequence $ map makeItem series')
               `mappend` defaultContext
 
       getResourceBody
