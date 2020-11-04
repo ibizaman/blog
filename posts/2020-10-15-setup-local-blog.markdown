@@ -1,6 +1,7 @@
 ---
 title: Setup a Hakyll Blog with Nix
 tags: hakyll, haskell, nix
+series: blog
 ---
 
 This blog post explains how to setup this site. You can find the

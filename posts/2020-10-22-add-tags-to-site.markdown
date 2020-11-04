@@ -1,6 +1,7 @@
 ---
 title: Add Tags to a Hakyll Site
 tags: hakyll
+series: blog
 ---
 
 Let's add some tags to each blog post. The tags are added in the

@@ -1,6 +1,7 @@
 ---
 title: Configure Emacs to Write this Blog With Nix
 tags: hakyll, haskell, nix, emacs, lsp, systemd
+series: blog
 ---
 
 We need to make Emacs find Haskell executables through Nix. It will
