@@ -246,7 +246,7 @@ Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 Type=forking
 ExecStart=/usr/bin/emacs --daemon
 ExecStop=/usr/bin/emacsclient --eval "(kill-emacs)"
-Environment=NIX_PROFILES=/nix/var/nix/profiles/default %h/.nix-profile
+Environment=NIX_PROFILES="/nix/var/nix/profiles/default %h/.nix-profile"
 Environment=NIX_PATH=%h/.nix-defexpr/channels
 Environment=NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 Environment=PATH=%h/.nix-profile/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:
