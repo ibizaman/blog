@@ -1,5 +1,5 @@
 # https://robertwpearce.com/hakyll-pt-6-pure-builds-with-nix.html
-{ compiler ? "ghc883"
+{ compiler ? "ghc884" # nix-env -f "<nixpkgs>" -qaP -A haskell.compiler
 , pkgs ? import <nixpkgs> {}
 }:
 
@@ -43,6 +43,7 @@ in
       ghcide
       brittany
       hlint
+      haskell-language-server
     ];
     withHoogle = true;
   };
