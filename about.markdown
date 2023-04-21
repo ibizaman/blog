@@ -2,6 +2,11 @@
 title: About
 ---
 
-I'm a software engineer interested in programming and electronics. I'm
-the father of 4 wonderful children. I like to tag along and help my
-wife in her various home improvement and wood working projects.
+I'm a software engineer interested in distributed programming and
+declarative infrastructure as well as IoT electronics and smart home
+projects. I'm working at [Fastly](https://www.fastly.com/) on the
+[Next-Gen
+Waf](https://www.fastly.com/products/web-application-api-protection)
+project, helping secure the web. I'm the father of 5 wonderful
+children. I like help my wife in her various home improvement and wood
+working projects.
