@@ -3,7 +3,7 @@ title: Sops on NixOps 2
 tags: nix, server
 ---
 
-Setting Sops is done by following the steps in the (README)[https://github.com/Mic92/sops-nix#usage-example] file. But I struggled on "Get a public key for your target machine" one. This is what it tells us to do:
+Setting Sops is done by following the steps in the [README](https://github.com/Mic92/sops-nix#usage-example) file. But I struggled on "Get a public key for your target machine" one. This is what it tells us to do:
 
 ```bash
 nix-shell -p ssh-to-age --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'
