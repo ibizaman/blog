@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: Server setup - Introduction
 tags: server
 ---
 
