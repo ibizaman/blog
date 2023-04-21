@@ -3,16 +3,18 @@ title: Sops on NixOps 2
 tags: nix, server
 ---
 
-Setting Sops is done by following the steps in the [README](https://github.com/Mic92/sops-nix#usage-example) file. But I struggled on "Get a public key for your target machine" one. This is what it tells us to do:
+Setting Sops is done by following the steps in the [README](https://github.com/Mic92/sops-nix#usage-example) file. But I struggled on step "Get a public key for your target machine". This is what it tells us to do:
 
 ```bash
-nix-shell -p ssh-to-age --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'
+nix-shell -p ssh-to-age \
+  --run 'cat /etc/ssh/ssh_host_ed25519_key.pub | ssh-to-age'
 ```
 
 But you need to ssh into the machine to get the public key. How to do that? Well, this "little" one liner does the trick:
 
 ```bash
-nixops export --network dev | jq '..|."virtualbox.publicHostKey"? | select(. != null)' -r
+nixops export --network dev | \
+  jq '..|."virtualbox.publicHostKey"? | select(. != null)' -r
 ```
 
 - The `..` is a recursive descent on all JSON object fields.
