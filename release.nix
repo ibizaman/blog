@@ -39,11 +39,11 @@ in
       project
     ];
     buildInputs = with haskellPackages; [
-      ghcid
-      ghcide
-      brittany
-      hlint
-      haskell-language-server
+      # ghcid
+      # ghcide
+      # brittany
+      # hlint
+      # haskell-language-server
     ];
     withHoogle = true;
   };
