@@ -30,11 +30,12 @@ emacsclient -e \
 
 and I needed to add the following snippet to my Emacs config:
 
-```elisp
+```lisp
 (defun my/focus-new-client-frame ()
   (select-frame-set-input-focus (selected-frame)))
 
-(add-hook 'server-after-make-frame-hook #'my/focus-new-client-frame)
+(add-hook 'server-after-make-frame-hook
+  #'my/focus-new-client-frame)
 ```
 
 I got that snippet from [this reddit
