@@ -7,8 +7,14 @@ I created a custom shortcut `Meta-T` in KDE with the following
 trigger:
 
 ```bash
-emacsclient -e "(progn (x-focus-frame nil) (org-capture))" --create-frame
+emacsclient -e "(org-capture)" --create-frame
 ```
+
+I went with calling `org-capture` directly as that shows a buffer
+where I can choose which template to use. If I was using the
+`org-protocol` feature, I'd need to setup one KDE shortcut per
+template, the maintenance of which would annoy me to no end, on top of
+filling up my global shortcuts.
 
 But this did not raise the new frame in all cases. For example, if I
 had my browser up and pressed `Meta-T`, the new Emacs frame would be
@@ -17,7 +23,9 @@ created but would not be focused.
 To make that work, I needed the shortcut trigger to be:
 
 ```bash
-emacsclient -e "(progn (x-focus-frame nil) (org-capture))" --create-frame
+emacsclient -e \
+  "(progn (x-focus-frame nil) (org-capture))" \
+  --create-frame
 ```
 
 and I needed to add the following snippet to my Emacs config:
