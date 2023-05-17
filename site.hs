@@ -1,4 +1,5 @@
 --------------------------------------------------------------------------------
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Maybe                     ( fromMaybe )
 import           Data.Monoid                    ( mappend )
@@ -31,7 +32,7 @@ main = hakyllWith conf $ do
       >>= loadAndApplyTemplate "templates/default.html" defaultContext
       >>= relativizeUrls
 
-  tags <- buildTags "posts/*" (fromCapture "tags/*.html")
+  tags <- buildTagsWith excludeWipPosts "posts/*" (fromCapture "tags/*.html")
   let postCtxWithTags = postCtx tags
 
   tagsRules tags $ \tag pattern -> do
@@ -49,7 +50,7 @@ main = hakyllWith conf $ do
         >>= loadAndApplyTemplate "templates/default.html" ctx
         >>= relativizeUrls
 
-  match "posts/*" $ do
+  matchMetadata "posts/*" (\metadata -> maybe True (\_ -> False) $ lookupString "wip" metadata) $ do
     route $ setExtension "html"
     compile
       $   pandocCompiler
@@ -125,3 +126,9 @@ tagsMetadata tags = do
   forM (tagsMap tags) $ \(tag, ids) -> do
     route' <- getRoute $ tagsMakeId tags tag
     return $ TagMetadata tag (fromMaybe "/" route') (length ids)
+
+excludeWipPosts :: MonadMetadata m => Identifier -> m [String]
+excludeWipPosts identifier =
+    getTagsByField "wip" identifier >>= \case
+        [] -> getTags identifier
+        _ -> return []
