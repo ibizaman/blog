@@ -34,9 +34,8 @@ on the server. We'll create two partitions, one for the OS, one for
 storing some files like a SSH public key that will allow us to SSH
 into the server without password.
 
-The most up-to-date instructions are, like always, on the [Arch
+Detailed instructions can be found in the [Arch
 wiki](https://wiki.archlinux.org/title/USB_flash_installation_medium).
-But read along to know what _I_ did.
 
 ## Download the Arch ISO
 
