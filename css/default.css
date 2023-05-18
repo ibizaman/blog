@@ -100,11 +100,16 @@ div.tags {
 }
 
 img {
-  border:solid 2px;
+  border: solid 2px;
   margin: auto;
   display: block;
   max-width:100%;
   max-height:100%;
+}
+
+a img {
+  border: none;
+  display: inline;
 }
 
 @media (max-width: 319px) {

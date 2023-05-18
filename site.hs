@@ -2,7 +2,6 @@
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
 import           Data.Maybe                     ( fromMaybe )
-import           Data.Monoid                    ( mappend )
 import           Hakyll
 import           Control.Monad                  ( forM )
 
@@ -55,6 +54,7 @@ main = hakyllWith conf $ do
     compile
       $   pandocCompiler
       >>= loadAndApplyTemplate "templates/post.html"    postCtxWithTags
+      >>= saveSnapshot "content"
       >>= loadAndApplyTemplate "templates/default.html" postCtxWithTags
       >>= relativizeUrls
 
@@ -91,6 +91,14 @@ main = hakyllWith conf $ do
         >>= loadAndApplyTemplate "templates/default.html" tagsCtx
         >>= relativizeUrls
 
+  create ["atom.xml"] $ do
+    route idRoute
+    compile $ do
+        let feedCtx = postCtxWithTags `mappend` bodyField "description"
+        posts <- fmap (take 10) . recentFirst =<<
+            loadAllSnapshots "posts/*" "content"
+        renderAtom myFeedConfiguration feedCtx posts
+
   match "index.html" $ do
     route idRoute
     compile $ do
@@ -122,7 +130,6 @@ data TagMetadata = TagMetadata
 
 tagsMetadata :: Tags -> Compiler [TagMetadata]
 tagsMetadata tags = do
-  let tagsList = map fst $ tagsMap tags
   forM (tagsMap tags) $ \(tag, ids) -> do
     route' <- getRoute $ tagsMakeId tags tag
     return $ TagMetadata tag (fromMaybe "/" route') (length ids)
@@ -132,3 +139,12 @@ excludeWipPosts identifier =
     getTagsByField "wip" identifier >>= \case
         [] -> getTags identifier
         _ -> return []
+
+myFeedConfiguration :: FeedConfiguration
+myFeedConfiguration = FeedConfiguration
+    { feedTitle       = "ibizaman's Blog"
+    , feedDescription = "I write about programming, electronics and some other DIY projects."
+    , feedAuthorName  = "ibizaman"
+    , feedAuthorEmail = "blog@pierre.tiserbox.com"
+    , feedRoot        = "https://ibizaman.github.io"
+    }
