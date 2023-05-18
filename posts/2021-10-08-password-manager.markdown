@@ -1,6 +1,7 @@
 ---
 title: Password Manager
 tags: server
+wip: true
 ---
 
 Before installing the OS on the server, we will setup a password
