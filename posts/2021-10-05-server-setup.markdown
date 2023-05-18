@@ -3,6 +3,9 @@ title: Server setup - Introduction
 tags: server
 ---
 
+**Note:** *since I wrote this blog post, I switched to using NixOS. I'm leaving this post up because
+it could still hold valuable info.*
+
 This is the introductory post in the let's build a server series. This
 series goes through all the steps needed to setup the same server I
 have at home. Along the way, I'll explain everything I know or thought
@@ -17,7 +20,7 @@ We'll also talk about how your laptop and phone will interact with the
 server, so essentially file synchronization, picture viewing and
 backup.
 
-![Our dashboard to be](/images/screenshot_keycloak.png)
+![Our dashboard to be](/images/screenshot_homer.png)
 
 We will install and configure on an Archlinux box:
 

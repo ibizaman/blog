@@ -3,6 +3,9 @@ title: OS Install
 tags: server
 ---
 
+**Note:** *since I wrote this blog post, I switched to using NixOS. I'm leaving this post up because
+it could still hold valuable info.*
+
 This is obviously the first step, we will install the OS. I chose
 Archlinux. Everything here should be adaptable to other linux
 distributions but the locations of files could be different.
