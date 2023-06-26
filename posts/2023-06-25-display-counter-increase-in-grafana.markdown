@@ -56,13 +56,15 @@ A:  sum (my_gauge) or vector (0)
 B:  sum (my_gauge offset $__interval) or vector (0)
 ```
 
+<img src="/images/grafana-20230625-6_vector(0).png" />
+
 If we again print the difference, we can see the total is accurate:
 
 ```
 C:  ($A - $B) >= 0
 ```
 
-<img src="/images/grafana-20230625-6_vector(0).png" />
+<img src="/images/grafana-20230625-7_A-Bvector(0).png" />
 
 But there’s a not pleasing gap there when the values drop. The final calculation is:
 
@@ -70,7 +72,7 @@ But there’s a not pleasing gap there when the values drop. The final calculati
 C:  ($A - $B) >= 0 or vector (0)
 ```
 
-<img src="/images/grafana-20230625-7_final.png" />
+<img src="/images/grafana-20230625-8_final.png" />
 
 The actual calculation I have is this ~~beautiful~~ horrendous formula:
 
