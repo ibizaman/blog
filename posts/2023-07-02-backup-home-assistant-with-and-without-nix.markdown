@@ -103,14 +103,7 @@ UMask=0027
 
 Finally, restart the service.
 
-Second, you need to update the files already created by Home Assistant:
-
-```bash
-sudo find /var/lib/hass -type d -exec chmod -r g+rx '{}' ';'
-sudo find /var/lib/hass -type f -exec chmod -r g+r '{}' ';'
-```
-
-In nix, all those steps are summarized with:
+In nix:
 
 ```nix
 users.users.hass.homeMode = "0750";
@@ -118,4 +111,11 @@ users.users.hass.homeMode = "0750";
 systemd.services.home-assistant.serviceConfig = {
   UMask = lib.mkForce "0027";
 };
+```
+
+Second, you need to update the files already created by Home Assistant:
+
+```bash
+sudo find /var/lib/hass -type d -exec chmod -r g+rx '{}' ';'
+sudo find /var/lib/hass -type f -exec chmod -r g+r '{}' ';'
 ```
