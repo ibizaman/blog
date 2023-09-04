@@ -16,7 +16,7 @@ conf = defaultConfiguration
 
 main :: IO ()
 main = hakyllWith conf $ do
-  match "images/*" $ do
+  match "images/**" $ do
     route idRoute
     compile copyFileCompiler
 
