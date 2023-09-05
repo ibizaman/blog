@@ -1,3 +1,10 @@
+---
+title: Why we switched from mockx to stubs when testing external systems
+tags: go
+wip: true
+---
+
+
 In our codebase, access to practically all external resources (databases, other internal or external services) is done through a dedicated Go struct with dedicated methods.
 
 For example, to access the MongoDB User collection, you must initialize a User struct with a connection pool previously initiated. Then, you pass around this User instance in your codebase. The trick is that every function accepting this User struct actually expects a Go interface with the functions it needs. This way, in prod we give it the real deal but in tests we give it something else.
