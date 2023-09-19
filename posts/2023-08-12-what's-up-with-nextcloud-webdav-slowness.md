@@ -246,14 +246,17 @@ all as I'm the only user?
 Looking back in the logs I could see that the `remote_addr` of the request was pointing to my router
 instance and not to the user's real IP address.
 
-This was due to my particular network setup. When making a request to my Nextcloud instance at
-`nextcloud.domain.com` from inside the same subnet as where the instance is located, my router kicks
-in and re-routes the request to the internal subnet. This somehow mangles the origin of the request
-and the Nextcloud instance thinks every request comes from the same IP, leading to bruteforce
-protection to kick in.
+Thanks to [@bb77](https://help.nextcloud.com/t/tutorial-on-profiling-nextcloud/170348/2?u=ibizaman)
+over in the Nextcloud forum, I learned my issue was due to [NAT
+hairpinning](https://en.wikipedia.org/wiki/Network_address_translation#NAT_hairpinning). This
+allows, I quote wikipedia, "a machine on the LAN is able to access another machine on the LAN via
+the external IP address of the LAN/router".
 
-TBH, I have no idea what my router is actually doing but I circumvented by adding
-`nextcloud.domain.com` to my internal dns server with:
+This is all great but this means the Nextcloud server was seeing all internal requests as coming
+from the same IP address, the one of my router, leading to more bruteforce mitigation than
+necessary.
+
+I circumvented by using split DNS by adding `nextcloud.domain.com` to my internal dns server with:
 
 ```nix
 services.dnsmasq = {
