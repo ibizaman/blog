@@ -57,6 +57,6 @@ code span.pp { color: #ffcfaf; font-weight: bold; } /* Preprocessor */
 code span.sc { color: #dca3a3; } /* SpecialChar */
 code span.ss { color: #cc9393; } /* SpecialString */
 code span.st { color: #cc9393; } /* String */
-code span.va { } /* Variable */
+code span.va { color: #7f9f7f; } /* Variable */
 code span.vs { color: #cc9393; } /* VerbatimString */
 code span.wa { color: #7f9f7f; font-weight: bold; } /* Warning */

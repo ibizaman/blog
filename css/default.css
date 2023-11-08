@@ -112,6 +112,11 @@ a img {
   display: inline;
 }
 
+p code {
+    color: #404040;
+    background-color: #dfc4a4;
+};
+
 @media (max-width: 319px) {
   body {
     width: 90%;
