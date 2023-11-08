@@ -3,10 +3,11 @@ title: Switch to Colmena for Local Deploys
 tags: nix
 ---
 
-The [Incentive](#incentive) section explains why I even wanted to do this. Feel free to skip to [][]
+The [Incentive](#incentive) section explains why I even wanted to do this. Feel free to skip to [the second paragraph](#switching-from-nixos-rebuild-to-colmena).
 
 <!--toc:start-->
 - [Incentive](#incentive)
+- [Switching From Nixos-Rebuild to Colmena](#switching-from-nixos-rebuild-to-colmena)
 <!--toc:end-->
 
 # Incentive
