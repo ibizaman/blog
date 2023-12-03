@@ -198,3 +198,5 @@ The two relevant commits are [6969b9][10] and [4f3e33][11].
 
 [10]: https://github.com/ibizaman/blog/commit/6969b9986aeacccb6fa1bd6fac372ffec3f53c37
 [11]: https://github.com/ibizaman/blog/commit/4f3e3337ba82a7606fe2f5fefbc0b19ad4c4748e
+
+The only thing to remember now is to correctly commit the blog post, which I already managed to forget once :D
