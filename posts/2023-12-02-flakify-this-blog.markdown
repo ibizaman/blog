@@ -7,10 +7,10 @@ tags: nix, blog
 
 I wanted to use flakes to build this blog since quite a while but never got to it.
 
-The last nudge needed was I was fed up with the current deploy process which involved a second
-repository (see a [previous blog post][1] for more details). It was really hindering my motivation
-to write blog posts. I wanted instead to deploy by just pushing to the main branch thanks to a
-GitHub action, like any sane person.
+The last nudge needed was I was fed up with the current deploy process which involved a [second
+repository](https://github.com/ibizaman/ibizaman.github.io) (see a [previous blog post][1] for more
+details). It was really hindering my motivation to write blog posts. I wanted instead to deploy by
+just pushing to the main branch thanks to a GitHub action, like any sane person.
 
 [1]: 2020-10-16-1-deploy-to-github-pages.html#actually-deploy
 
@@ -200,3 +200,7 @@ The two relevant commits are [6969b9][10] and [4f3e33][11].
 [11]: https://github.com/ibizaman/blog/commit/4f3e3337ba82a7606fe2f5fefbc0b19ad4c4748e
 
 The only thing to remember now is to correctly commit the blog post, which I already managed to forget once :D
+
+# Addendum
+
+I needed to disable the pages integration on my second - now useless - repo so that I could add the correct custom domain to deploy to to my current repo. I just went and archive that second repo altogether.
