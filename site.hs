@@ -146,5 +146,5 @@ myFeedConfiguration = FeedConfiguration
     , feedDescription = "I write about programming, electronics and some other DIY projects."
     , feedAuthorName  = "ibizaman"
     , feedAuthorEmail = "blog@pierre.tiserbox.com"
-    , feedRoot        = "https://ibizaman.github.io"
+    , feedRoot        = "https://blog.tiserbox.com/"
     }
