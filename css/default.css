@@ -112,6 +112,24 @@ a img {
   display: inline;
 }
 
+img.zoom, img.zoom-15  {
+    /* ease | ease-in | ease-out | linear */
+    transition: transform ease-in-out 0.3s;
+}
+
+img.zoom-15:hover {
+    transform: scale(1.5);
+}
+
+img.zoom:hover {
+    transform: scale(2.5);
+}
+
+:is(img.zoom,img.zoom-15) + figcaption:after {
+  content: " hover to zoom";
+  font-style: italic;
+}
+
 p code {
     color: #404040;
     background-color: #dfc4a4;
