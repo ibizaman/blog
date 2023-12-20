@@ -7,7 +7,7 @@ My Nextcloud instance feels... sluggish, for lack of better term. It's working, 
 feels slow. Pages take seconds to load. Let's continue our [previous investigation][01] of Nextcloud
 slowness and try to fix this.
 
-[01]: (/posts/2023-08-12-what%27s-up-with-nextcloud-webdav-slowness.html#lets-profile-nextcloud)
+[01]: /posts/2023-08-12-what%27s-up-with-nextcloud-webdav-slowness.html#lets-profile-nextcloud
 
 I will warn you, not all investigations did lead to an optimization, most were dead ends. But I
 think the process is still valuable as I will show you interesting techniques. So it's worth to read
@@ -82,8 +82,6 @@ Let's analyze the profile with KCacheGrind:
 ```bash
 nix run nixpkgs#kcachegrind xdebug/cachegrind.out.43532
 ```
-
-No need to install KCacheGrind, let's just download it on demand. I love NixOS.
 
 With KCacheGrind open, we can then sort all the function calls by the `self` parameter. This will show us where most of the time is spent.
 
@@ -547,9 +545,9 @@ only. Also, this won't work if my internet is disconnected.
 
 Secondly, the subsequent HTTP call (which we didn't see in the profile) will try to contact my
 OnlyOffice service using my public IP address instead of the private IP directly. This means at
-least more hops and so an increased response time. Actually, the router is smart and realizes the
-public IP is its own so the request won't actually go out to the internet thanks to [NAT
-hairpinning][21]. Here it's helping us a bit but it [bit me previously][22].
+least more hops and so an increased response time. Actually, the router is smart and realizes the IP
+I want to reach is its own public IP so the request won't actually go out to the internet thanks to
+[NAT hairpinning][21]. Here it's helping us a bit but it [bit me previously][22].
 
 [21]: https://en.m.wikipedia.org/wiki/Network_address_translation#NAT_hairpinning
 [22]: https://blog.tiserbox.com/posts/2023-08-12-what's-up-with-nextcloud-webdav-slowness.html#the-issue-was-seemingly-unrelated
@@ -605,9 +603,8 @@ I'm just reloading the `/apps/files/?dir=/` endpoint and there are quite a few i
 I see files, files, files. I bet this `oc_filecache` table has something to do with all these.
 Actually, no! It's Redis, another dependency of Nextcloud used for caching.
 
-All the profiles have one thing in common, they spend a lot of time on calling making calls to
-Redis. Sometimes 30% of the time as can be seen in the following table showing the Redis calls, one
-row per profile:
+All the profiles have one thing in common, they spend a lot of time calling to Redis. Sometimes 30%
+of the time as can be seen in the following table which I compiled from 4 profiles:
 
 | Time (ms) | # Calls | Per Call (ms) | % of Request |
 |-----------|---------|---------------|--------------|
@@ -618,8 +615,9 @@ row per profile:
 
 3 milliseconds per call is not much, but it adds up.
 
-The [documentation](https://redis.io/docs/management/optimization/latency/) gives us a good hint, it
-could be Redis swapping to disk. To check that, we can issue the following command:
+The [documentation](https://redis.io/docs/management/optimization/latency/) gives us a good hint as
+to why Redis could be slow, it could be Redis swapping to disk. To check that, we can issue the
+following command:
 
 ```bash
 $ sudo -u nextcloud redis-cli -s /run/redis-nextcloud/redis.sock info | grep process_id
@@ -639,8 +637,8 @@ Swap:   19004 kB
 
 Indeed, a few memory maps are pretty heavily swapped. Not good, I suppose?
 
-That makes me think, could this be the case also for PostgreSQL? I issued the same commands as
-above, using `systemctl cat postgresql` to get the PID. And Indeed, that was the case.
+That made me think, could this be the case also for PostgreSQL? I issued the same commands as above,
+using `systemctl cat postgresql` to get the PID. And Indeed, that was the case.
 
 I don't have a permanent fix against swapping but I could already test if swapping has an impact
 simply by restarting Redis and PostgreSQL. I did that, re-ran the `smaps` command above, verified
