@@ -10,13 +10,14 @@ This blog post is as much a memo for myself than a terse guide to people wanting
 
 ## Partitioning
 
-From https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations
+From
+[https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations)
 
 > Create your pool using whole disks: When running zpool create use whole disk names. This will
 > allow ZFS to automatically partition the disk to ensure correct alignment. It will also improve
 > interoperability with other OpenZFS implementations which honor the wholedisk property.
 
-From https://wiki.archlinux.org/title/ZFS#Storage_pools there's mixed messaging.
+From [https://wiki.archlinux.org/title/ZFS#Storage_pools](https://wiki.archlinux.org/title/ZFS#Storage_pools) there's mixed messaging.
 
 > It is not necessary to partition the drives before creating the ZFS filesystem. It is recommended
 > to point ZFS at an entire disk (ie. /dev/sdx rather than /dev/sdx1), which will automatically
@@ -30,7 +31,7 @@ while a bit later:
 > over provision spindle drives to ensure that different models with slightly different sector
 > counts can zpool replace into your mirrors.
 
-From https://forums.freebsd.org/threads/zfs-whole-disk-vs-gpt-slice.62855/
+From [https://forums.freebsd.org/threads/zfs-whole-disk-vs-gpt-slice.62855/](https://forums.freebsd.org/threads/zfs-whole-disk-vs-gpt-slice.62855/)
 
 That user posted some good links. It seems using partitions is totally fine. That anyway, giving a
 full disk to ZFS on Linux will create a GPT partition anyway.
@@ -38,7 +39,7 @@ full disk to ZFS on Linux will create a GPT partition anyway.
 I will try with partitions and by naming them with GPT labels. Labels are great because they are
 unique and can convey meaning.
 
-```
+```bash
 $ nix shell nixpkgs#gptfdisk
 
 $ sudo fdisk -l
@@ -59,7 +60,7 @@ Sector size (logical/physical): 512 bytes / 4096 bytes
 I/O size (minimum/optimal): 4096 bytes / 4096 bytes
 ```
 
-```
+```bash
 $ sudo gdisk -l /dev/sdb
 Command (? for help): n
 Partition number (1-128, default 1):
@@ -101,7 +102,7 @@ I then did the same with `/dev/sdc`.
 I chose a label name with no space otherwise spaces gets replaced with `\x20` which gives names
 like: `'ZFS\x20data\x20mirror\x201'`. No thanks.
 
-```
+```bash
 $ ls -1 /dev/disk/by-partlabel/
 ZFSmirror1
 ZFSmirror2
@@ -109,7 +110,7 @@ ZFSmirror2
 
 ## Enable ZFS on the machine
 
-From https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/ :
+From [https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/) :
 
 ```nix
 boot.supportedFilesystems = [ "zfs" ];
@@ -132,7 +133,7 @@ networking.hostId = "3d6f479a";
 
 ## Create zpool
 
-From https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations I got that a good argument is:
+From [https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations](https://openzfs.github.io/openzfs-docs/Project%20and%20Community/FAQ.html#performance-considerations) I got that a good argument is:
 
   - `-o ashift=12`
 
@@ -141,7 +142,7 @@ Also:
 > Have enough memory: A minimum of 2GB of memory is recommended for ZFS. Additional memory is
 > strongly recommended when the compression and deduplication features are enabled.
 
-From https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/, I got:
+From [https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/,](https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/,) I got:
 
   - `-o ashift=12`
   - `-o xattr=sa`
@@ -152,7 +153,7 @@ From https://jrs-s.net/2018/08/17/zfs-tuning-cheat-sheet/, I got:
 I won't be using a SLOG as this zpool will hold pictures and documents, so large files. Also no
 L2ARV for me as I don't have that much RAM available.
 
-From https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html
+From [https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html)
 
   - `-o ashift=12`
   - `-o autotrim=on`
@@ -177,7 +178,7 @@ About dnodesize:
 
 My final command was:
 
-```
+```bash
 $ nix shell nixpkgs#gptfdisk
 $ zpool create \
     -o ashift=12 \
@@ -200,7 +201,7 @@ $ zpool create \
 
 This command will ask you for a passphrase.
 
-```
+```bash
 $ zpool status -v
   pool: data
  state: ONLINE
@@ -217,7 +218,7 @@ errors: No known data errors
 I chose legacy mountpoint just so I could mount them manually in a temporary directory and transfer
 over what needed to be.
 
-```
+```bash
 $ sudo zfs create -o mountpoint=legacy data/nextcloud
 $ sudo zfs create -o mountpoint=legacy data/git
 ```
@@ -226,7 +227,7 @@ $ sudo zfs create -o mountpoint=legacy data/git
 
 Nothing fancy here but I wanted to put some.
 
-From https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html:
+From [https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html:](https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html:)
 
 ```bash
 $ sudo zfs set quota=4T data/nextcloud
@@ -237,7 +238,7 @@ It can also be done at creation by using `-o quote=<size>`.
 
 ## Reservation for Performance
 
-From https://web.archive.org/web/20161028084224/http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Storage_Pool_Performance_Considerations :
+From [https://web.archive.org/web/20161028084224/http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Storage_Pool_Performance_Considerations](https://web.archive.org/web/20161028084224/http://www.solarisinternals.com/wiki/index.php/ZFS_Best_Practices_Guide#Storage_Pool_Performance_Considerations) :
 
 > Keep pool space under 80% utilization to maintain pool performance. Currently, pool performance
 > can degrade when a pool is very full and file systems are updated frequently, such as on a busy
@@ -248,7 +249,7 @@ From https://web.archive.org/web/20161028084224/http://www.solarisinternals.com/
 
 For my workload, I chose roughly 90%, so I'll reserve 1Tb from the ~12Tb available.
 
-From https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html :
+From [https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html](https://docs.oracle.com/cd/E23823_01/html/819-5461/gazvb.html) :
 
 ```bash
 $ sudo zfs set reservation=1T data
@@ -260,15 +261,15 @@ Mount new pool to a temporary directory under a temporary root `/pool` directory
 with `rsync`.
 
 ```bash
-sudo mount -t zfs data/nextcloud /pool/nextcloud
-sudo rsync -aHP /srv/data/nextcloud/ /pool/nextcloud
+$ sudo mount -t zfs data/nextcloud /pool/nextcloud
+$ sudo rsync -aHP /srv/data/nextcloud/ /pool/nextcloud
 ```
 
 ## Mount in correct location
 
 ```bash
-sudo umount /srv/nextcloud
-sudo zfs set mountpoint=/srv/nextcloud data/nextcloud
+$ sudo umount /srv/nextcloud
+$ sudo zfs set mountpoint=/srv/nextcloud data/nextcloud
 ```
 
 Setting the mountpoint this way will let ZFS mount the pool.
@@ -278,13 +279,13 @@ Setting the mountpoint this way will let ZFS mount the pool.
 Because we encrypted the zpool, On reboot, you need to run:
 
 ```bash
-sudo zpool import data
-sudo zfs load-key data
-sudo zfs mount -a
+$ sudo zpool import data
+$ sudo zfs load-key data
+$ sudo zfs mount -a
 ```
 
 There are ways to automate this like [remote unlocking](https://nixos.wiki/wiki/ZFS#Remote_unlock).
 
 ## Next
 
-Next will be snapshots and automating mounting after reboots..
+Next will be snapshots and automating mounting after reboots.
