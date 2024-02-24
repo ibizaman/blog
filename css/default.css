@@ -6,6 +6,8 @@ body {
   font-size: 1.6rem;
   color: #000;
   background-color: #cdb79e;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 header {
