@@ -550,8 +550,14 @@ There's a few more things I'd like to call out from the snippet above.
 - Since we only have a finite time to run the test, the more edge cases you have, the less chance
   you'll have to actually exercise all the edge case combinations in one test run. There are two
   ways to go about that: input generation engineering and classification. We covered the former
-  above. The library we use does not support classification out of the box but you can implement it
-  yourself.
+  above.
+
+Classification means we add a label to each edge case. Each time an edge case gets reached, we
+increment the related label's counter by 1. At the end of the test, we generate a report that shows
+the distribution of edge case. We can then analyze this distribution to ensure all the edge cases
+got reached a sufficient amount of times. If not, we need to either run the tests longer or to
+either change how we generate the inputs. Classification is in general useful when we have a lot of
+edge cases.
 
 # Great Success
 
