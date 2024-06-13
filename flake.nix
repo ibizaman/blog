@@ -17,6 +17,7 @@
       ];
     in
       flake-utils.lib.eachSystem supportedSystems (system:
+        # nix run . watch
         hakyll-flakes.lib.mkAllOutputs {
           inherit system;
           name = "site";
