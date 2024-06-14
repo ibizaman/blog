@@ -4,6 +4,7 @@
 import           Data.Maybe                     ( fromMaybe )
 import           Hakyll
 import           Control.Monad                  ( forM )
+import Hakyll.Favicon (faviconsRules, faviconsField)
 
 
 --------------------------------------------------------------------------------
@@ -105,6 +106,7 @@ main = hakyllWith conf $ do
       posts <- recentFirst =<< loadAll "posts/*"
       let indexCtx =
             listField "posts" postCtxWithTags (return posts)
+              `mappend` faviconsField
               `mappend` defaultContext
 
       getResourceBody
@@ -113,6 +115,8 @@ main = hakyllWith conf $ do
         >>= relativizeUrls
 
   match "templates/*" $ compile templateBodyCompiler
+
+  faviconsRules "images/favicon.jpeg"
 
 
 --------------------------------------------------------------------------------
