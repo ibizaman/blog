@@ -27,9 +27,11 @@ main = hakyllWith conf $ do
 
   match (fromList ["about.md", "contact.md"]) $ do
     route $ setExtension "html"
+    let ctx = faviconsField
+              `mappend` defaultContext
     compile
       $   pandocCompiler
-      >>= loadAndApplyTemplate "templates/default.html" defaultContext
+      >>= loadAndApplyTemplate "templates/default.html" ctx
       >>= relativizeUrls
 
   tags <- buildTagsWith excludeWipPosts "posts/*" (fromCapture "tags/*.html")
@@ -43,6 +45,7 @@ main = hakyllWith conf $ do
       let ctx =
             constField "title" title
               `mappend` listField "posts" postCtxWithTags (return posts)
+              `mappend` faviconsField
               `mappend` defaultContext
 
       makeItem ""
@@ -85,6 +88,7 @@ main = hakyllWith conf $ do
                 <> field "count" (return . show . tagCount . itemBody)
                 )
                 (sequence $ map makeItem $ tags')
+              `mappend` faviconsField
               `mappend` defaultContext
 
       getResourceBody
@@ -124,6 +128,7 @@ postCtx :: Tags -> Context String
 postCtx tags =
   tagsField "tags" tags
     `mappend` dateField "date" "%B %e, %Y"
+    `mappend` faviconsField
     `mappend` defaultContext
 
 data TagMetadata = TagMetadata

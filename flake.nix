@@ -26,6 +26,7 @@
           websiteBuildInputs = with nixpkgs.legacyPackages.${system}; [
             cabal-install
             haskell-language-server
+            imagemagick
             # rubber
             # texlive.combined.scheme-full
             # poppler_utils
