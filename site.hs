@@ -62,19 +62,19 @@ main = hakyllWith conf $ do
       >>= loadAndApplyTemplate "templates/default.html" postCtxWithTags
       >>= relativizeUrls
 
-  create ["archive.html"] $ do
-    route idRoute
-    compile $ do
-      posts <- recentFirst =<< loadAll "posts/*"
-      let archiveCtx =
-            listField "posts" postCtxWithTags (return posts)
-              `mappend` constField "title" "Archive"
-              `mappend` defaultContext
+  -- create ["archive.html"] $ do
+  --   route idRoute
+  --   compile $ do
+  --     posts <- recentFirst =<< loadAll "posts/*"
+  --     let archiveCtx =
+  --           listField "posts" postCtxWithTags (return posts)
+  --             `mappend` constField "title" "Archive"
+  --             `mappend` defaultContext
 
-      makeItem ""
-        >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
-        >>= loadAndApplyTemplate "templates/default.html" archiveCtx
-        >>= relativizeUrls
+  --     makeItem ""
+  --       >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
+  --       >>= loadAndApplyTemplate "templates/default.html" archiveCtx
+  --       >>= relativizeUrls
 
   create ["tags.html"] $ do
     route idRoute
@@ -120,7 +120,7 @@ main = hakyllWith conf $ do
 
   match "templates/*" $ compile templateBodyCompiler
 
-  faviconsRules "images/favicon.jpeg"
+  faviconsRules "images/favicon.svg"
 
 
 --------------------------------------------------------------------------------
