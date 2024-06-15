@@ -3,6 +3,8 @@ title: Add Patches to Nixpkgs
 tags: nix
 ---
 
+_edit 2024-06-15: fix snippet_
+
 Following the trail from [discourse][1] to a [closed GitHub pull request][2] to a comment in a
 [second GitHub pull request][3] :) I'm happy to share that we can now easily apply patches to
 `nixpkgs` itself.
@@ -22,17 +24,18 @@ This is what applying a patch looks like now:
 ```nix
 let
   system = "x86_64-linux";
-  patches = [
-    {
-      url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/268168.patch";
-      hash = "sha256-WIMDnmZV0eL1eFVD0ldHUBrulZWsjdFOmcN4i8+RgFA=";
-    }
-  ];
   originPkgs = nixpkgs.legacyPackages.${system};
-  patchednixpkgs = originPkgs.applyPatches {
+
+  patches = [
+    (originPkgs.fetchpatch {
+      url = "https://patch-diff.githubusercontent.com/raw/NixOS/nixpkgs/pull/315018.patch";
+      hash = "sha256-8jcGyO/d+htfv/ZajxXh89S3OiDZAr7/fsWC1JpGczM=";
+    })
+  ];
+  patchedNixpkgs = originPkgs.applyPatches {
     name = "nixpkgs-patched";
     src = nixpkgs;
-    patches = map originPkgs.fetchpatch patches;
+    inherit patches;
   };
 in
   {
