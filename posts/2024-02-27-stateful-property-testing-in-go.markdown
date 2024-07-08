@@ -3,6 +3,17 @@ title: Use Case for Stateful Property Testing in Go
 tags: go, testing
 ---
 
+<!--toc:start-->
+- [Our Initial Problem - A Driver Migration](#our-initial-problem-a-driver-migration)
+- [Business Logic Led To Combinatory Explosion When Testing](#business-logic-led-to-combinatory-explosion-when-testing)
+- [Property Testing](#property-testing)
+- [Stateful Property Testing](#stateful-property-testing)
+- [Stateful Property Testing to Tame The Combinatory Explosion](#stateful-property-testing-to-tame-the-combinatory-explosion)
+- [Great Success](#great-success)
+<!--toc:end-->
+
+(Part 2 of this blog post is posted [here][blog2])
+
 In this blog post, I'll explain what problem I tried to solve by introducing stateful property
 testing at work, what is stateful property testing, how well that worked out and what other extra
 benefits came along with stateful property testing.
@@ -570,3 +581,6 @@ in deploying our changes.
 In a following post, I will talk about an additional benefit of the stateful property tests as we
 wrote them: they allowed to switch from mocks to stubs. We will see how they helped and just why
 switching to stub is a good idea in the first place.
+This next blog post is now posted [here][blog2].
+
+[blog2]: 2024-07-08-make-good-stubs-with-stateful-property-testing.html
