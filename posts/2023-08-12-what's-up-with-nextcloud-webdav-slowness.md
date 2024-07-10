@@ -1,6 +1,6 @@
 ---
 title: What's up with Nextcloud webdav slowness?
-tags: nextcloud
+tags: nextcloud, performance
 ---
 
 Accessing Nextcloud's web UI, using http, seems reasonably fast but accessing the webdav interface

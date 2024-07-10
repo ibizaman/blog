@@ -1,6 +1,6 @@
 ---
 title: Investigate Nextcloud Slowness Part 2
-tags: nextcloud, postgresql
+tags: nextcloud, postgresql, performance
 ---
 
 My Nextcloud instance feels... sluggish, for lack of better term. It's working, but it definitely
