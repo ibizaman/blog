@@ -71,7 +71,7 @@ Also, everything is explained in the `sops-nix` repo's readme file.
 
 The issue here is we can't use `nixos-rebuild` to deploy keys with `sops-nix` or any other key
 management system. You need to switch to `nixops`, `colmena` or any other such deploy system listed
-[here](https://nixos.wiki/wiki/Applications#Deployment).
+[here](https://wiki.nixos.org/wiki/Applications#Deployment).
 
 # Switching From Nixos-Rebuild to Colmena
 
