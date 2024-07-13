@@ -26,11 +26,11 @@ the configuration:
 2. and the passphrase will be stored in the git repo you use to manage your deploy.
 
 The solution to the first issue is to use something like the `deployment.keys` option that is
-supported by most [deployment tools](https://nixos.wiki/wiki/Applications#Deployment).
+supported by most [deployment tools](https://wiki.nixos.org/wiki/Applications#Deployment).
 
 The solution to the second issue is to encrypt the secret in the repo, and decrypt it on the target
 machine, after deploy. [Multiple
-tools](https://nixos.wiki/wiki/Comparison_of_secret_managing_schemes) exist to handle this.
+tools](https://wiki.nixos.org/wiki/Comparison_of_secret_managing_schemes) exist to handle this.
 
 In this post, we will use [sops-nix](https://github.com/Mic92/sops-nix) which provides a solution
 for both issues.

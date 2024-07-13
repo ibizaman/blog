@@ -18,7 +18,7 @@ always obvious how all the parts should fit together.
 
 # Install NixOS
 
-Follow the [Official NixOS on Raspberry Pi wiki](https://nixos.wiki/wiki/NixOS_on_ARM/Raspberry_Pi).
+Follow the [Official NixOS on Raspberry Pi wiki](https://wiki.nixos.org/wiki/NixOS_on_ARM/Raspberry_Pi).
 You should be able to download a pre-built image through Hydra which was nice. The guide will walk
 you through writing the image to a SD card and booting up the PI for the first time.
 
