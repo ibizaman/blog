@@ -284,7 +284,7 @@ $ sudo zfs load-key data
 $ sudo zfs mount -a
 ```
 
-There are ways to automate this like [remote unlocking](https://nixos.wiki/wiki/ZFS#Remote_unlock).
+There are ways to automate this like [remote unlocking](https://wiki.nixos.org/wiki/ZFS#Remote_unlock).
 
 ## Next
 

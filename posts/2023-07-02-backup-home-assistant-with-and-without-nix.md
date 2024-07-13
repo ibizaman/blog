@@ -71,7 +71,7 @@ services.home-assistant = {
 };
 ```
 
-Note that I [combine declarative and UI defined automations](https://nixos.wiki/wiki/Home_Assistant#Combine_declarative_and_UI_defined_automations).
+Note that I [combine declarative and UI defined automations](https://wiki.nixos.org/wiki/Home_Assistant#Combine_declarative_and_UI_defined_automations).
 
 # Allow backup user to access Home Assistant backup folder
 
