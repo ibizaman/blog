@@ -19,10 +19,12 @@ From Magit, it is possible to create pull requests.
 Of course, we need to setup a secret token to be able to create a pull request on the forge.
 
 One way is to store the secret in a file read by emacs.
-By default, those files are:
+By default, `auth-sources` variable is:
 
-```elisp
-("~/.authinfo" "~/.authinfo.gpg" "~/.netrc")
+```lisp
+("~/.authinfo"
+ "~/.authinfo.gpg"
+ "~/.netrc")
 ```
 
 The issue is these files store the secrets in clear text.
@@ -111,19 +113,22 @@ We can then compile the package ourselves:
 Now we have an emacs with the emacs-bitwarden package loaded.
 We can verify this by looking at `auth-sources`:
 
-```elisp
-(bitwarden "~/.authinfo" "~/.authinfo.gpg" "~/.netrc")
+```lisp
+(bitwarden
+ "~/.authinfo"
+ "~/.authinfo.gpg"
+ "~/.netrc")
 ```
 
 Now, in Magit, we can open a repository and try to create a pull request:
 
-```
+```lisp
 M-x forge-create-pullreq
 ```
 
 After writing the description, I tried to create the pull request with `C-c C-c` but got this error message:
 
-```
+```bash
 ghub--token: Required Github token
 ("ibizaman^forge" for either "api.github.com"
 or "api.github.com") does not exist.
@@ -131,7 +136,7 @@ or "api.github.com") does not exist.
 
 This tells me exactly what secret I need to add in Bitwarden.
 
-First, let's create a PAT in Github in [](https://github.com/settings/personal-access-tokens)
+First, let's create a PAT in Github in [https://github.com/settings/personal-access-tokens](https://github.com/settings/personal-access-tokens)
 with fine-grained permissions and give the following permissions:
 
 - `Administration - write`
@@ -143,6 +148,17 @@ Now, we store this value in Bitwarden in a secret with:
 - `Password` = PAT from Github
 - `Website` = `api.github.com`
 - `Name` = Name can be anything of your choosing.
+
+Before being able to see the password,
+`auth-sources` will need some cleanup:
+
+```lisp
+M-x auth-source-forge-all-cached
+M-x bitwarden-login
+M-x bitwarden-unlock
+```
+
+See next section for more explanation on those options.
 
 ## Misc
 
@@ -171,7 +187,7 @@ bw login
 
 or in emacs:
 
-```elis
+```lisp
 M-x bitwarden-login
 ```
 
@@ -186,7 +202,7 @@ bw unlock
 
 or in emacs:
 
-```elis
+```lisp
 M-x bitwarden-unlock
 ```
 
@@ -200,6 +216,6 @@ bw sync
 
 or in emacs:
 
-```elis
+```lisp
 M-x bitwarden-sync
 ```
