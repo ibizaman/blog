@@ -17,6 +17,8 @@ Until I bumped into the issue that it solved!
 I'm writing this blog post so you're aware `buildFHSEnv` exists
 and hopefully you'll think of it if you need it.
 
+> Comments can be found in the [discourse post](https://discourse.nixos.org/t/using-buildfhsenv-for-dynamically-linked-libraries-with-esphome-as-example/79990).
+
 # Context
 
 I wanted to flash [espcontrol][] on a touchscreen / display frame I just bought.
@@ -212,11 +214,16 @@ https://nix.dev/permalink/stub-ld
 gives some useful tips but it does not talk about `buildFHSEnv`
 which I find nicer to use in this context.
 
-[https://nixos.wiki/wiki/ESP-IDF](https://nixos.wiki/wiki/ESP-IDF)
+[https://wiki.nixos.org/wiki/ESP-IDF](https://wiki.nixos.org/wiki/ESP-IDF)
 is also a nice guide although it looks quite low-level.
 Also, there's a warning so I didn't venture into that:
 
 > Warning: As of ESP-IDF v5.0, the following guide does not work properly and results in errors. Any contributions toward a fix would be appreciated.
+
+There is also [nixpkgs-esp-dev](https://github.com/mirrexagon/nixpkgs-esp-dev)
+which should help solve this but I didn't try it because I was not aware it existed
+before publishing this blog post!
+See [this discourse comment](https://discourse.nixos.org/t/using-buildfhsenv-for-dynamically-linked-libraries-with-esphome-as-example/79990/2).
 
 # The fix
 
@@ -296,6 +303,8 @@ Now that I compiled the project, I found [some issues][] which were reported ups
 So if you ever buy the same display as me, you'll be good to go.
 
 [some issues]: https://github.com/lamiskin/espcontrol-community-devices/issues/113
+
+Want to discuss about this? Head to the [discourse post](https://discourse.nixos.org/t/using-buildfhsenv-for-dynamically-linked-libraries-with-esphome-as-example/79990).
 
 And that's all folks.
 
