@@ -9,6 +9,8 @@ I take a while to implement some integration but it's done and I'm happy. Then 6
 
 **This blog article is about how I pushed NixOS VM tests to the max to fix this once and for all.**
 
+> Comments can be found in the [discourse post](https://discourse.nixos.org/t/testing-ldap-and-sso-integrations-in-nixos-with-playwright/79768).
+
 ## Automated Updates
 
 In my project SelfHostBlocks, I add a layer on top of services like Nextcloud, Home Assistant, Jellyfin, Immich, etc. that sets up a lot of features declaratively. One particularly rare feature I've seen in other projects is integrating those services with an LDAP provider (LLDAP) and an SSO provider (Authelia) completely self-hosted and declaratively.
@@ -897,3 +899,5 @@ You'll also notice comments linking to issues [842](https://github.com/ibizaman/
 We're really at the end here. If you followed along, well, thanks! It was a long and frustrated journey to get this result but I don't regret it. I like those tests and plan to cover more services.
 
 Feel free to [check the repo](https://github.com/ibizaman/selfhostblocks) or join the [Matrix chat](https://matrix.to/#/#selfhostblocks:matrix.org) to talk about it.
+
+Want to comment on this blog post? Head to the [discourse post](https://discourse.nixos.org/t/testing-ldap-and-sso-integrations-in-nixos-with-playwright/79768).
