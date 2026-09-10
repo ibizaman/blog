@@ -17,6 +17,8 @@ Here, I'll show you my current workflow which makes writing those tests actually
 
 [previous blog post]: https://blog.tiserbox.com/posts/2026-08-22-testing-ldap-and-sso-integrations-in-nix-os-with-playwright.html
 
+> Comments can be found in the [discourse post](https://discourse.nixos.org/t/ultimate-dev-environment-for-playwright-nixos-vm-tests/80023).
+
 # Previous tedious flow
 
 Until recently, actually figuring out all the peculiarities of a service
@@ -348,3 +350,5 @@ This new workflow is at least 10 times more powerful than my previous one.
 I'm not kidding. [My latest PR](https://github.com/ibizaman/selfhostblocks/pull/860)
 adding initial declarative admin setup to Immich
 was so easy, it prompted me to write this blog post!
+
+Want to comment on this blog post? Head to the [discourse post](https://discourse.nixos.org/t/ultimate-dev-environment-for-playwright-nixos-vm-tests/80023).
